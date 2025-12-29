@@ -20,7 +20,8 @@
     "pngjs": "^7.0.0",
     "puppeteer": "^24.12.1",
     "screenshot-desktop": "^1.15.2",
-    "text-to-svg": "^3.1.5"
+    "text-to-svg": "^3.1.5",
+    "xlsx": "^0.18.5"
   },
   "pkg": {
     "assets": [
