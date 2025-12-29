@@ -139,7 +139,8 @@ function runWindowsScriptForName(fileName, name, isFirstPrinting) {
   // Update these paths to your actual Windows location.
   // Double backslashes are needed inside JS strings.
   const templatePath = "C:\\template.xcs";
-  const svgPath = `C:\\${name}.svg`;
+  //const svgPath = `C:\\${name}.svg`;
+  const svgPath = fileName;
 
   const scriptContent = `
 ${psPrelude()}
