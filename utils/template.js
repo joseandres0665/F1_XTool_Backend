@@ -30,9 +30,9 @@ const OUT_TTF  = path.join(__dirname, '../fonts/CokeOutline.ttf');
 
 
 const { 
-  runAppleScriptForName, 
-  runAppleScriptForPreAction,
-  runAppleScriptForClosePrinting
+  runWindowsScriptForName, 
+  runWindowsScriptForPreAction,
+  runWindowsScriptForClosePrinting
 } = require('./appleScript');
 const { readFontSettings } = require('./settings');
 
@@ -115,7 +115,7 @@ async function generateTemplatePNG(name, isFirstPrinting) {
     const OUTPUT   = path.join(outputDir, `${name}.svg`);
     const real_filename = await renderTextWithScreenshot(name, fontSize, canvasWidth, canvasHeight, OUTPUT);
 
-    await runAppleScriptForPreAction();
+    await runWindowsScriptForPreAction();
 
     screenshot().then(async (img) => {
       const image = await Jimp.Jimp.read(img);
@@ -126,12 +126,12 @@ async function generateTemplatePNG(name, isFirstPrinting) {
       console.log(rgba);
 
       if(rgba.r === 92 && rgba.g === 186 && rgba.b === 84) {
-        await runAppleScriptForClosePrinting();
-        console.log('runAppleScriptForClosePrinting');
+        await runWindowsScriptForClosePrinting();
+        console.log('runWindowsScriptForClosePrinting');
       }
-      console.log('runAppleScriptForName');
+      console.log('runWindowsScriptForName');
       
-      runAppleScriptForName(OUTPUT, name, isFirstPrinting)
+      runWindowsScriptForName(OUTPUT, name, isFirstPrinting)
         .then(output => console.log("Success:", output))
         .catch(err => console.error("Error:", err));
     });

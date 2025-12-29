@@ -2,217 +2,23 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-function runAppleScriptForClosePrinting() {
-  const scriptContent = `
-do shell script "cliclick c:3000,300"
-delay 1
-  `;
-
-  return getPromiseRunScript(scriptContent);
-}
-
-function runAppleScriptForPreAction() {
-  const scriptContent = `
--- Define the target size
-set targetWidth to 1440
-set targetHeight to 900
-
--- Get the main screen size
-tell application "Finder"
-	set screenBounds to bounds of window of desktop
-end tell
-
-set screenWidth to item 3 of screenBounds
-set screenHeight to item 4 of screenBounds
-
--- Calculate centered position
-set posX to (screenWidth - targetWidth) / 2
-set posY to (screenHeight - targetHeight) / 2
-
-tell application "System Events"
-	set visible of application process "xTool Creative Space" to true
-end tell
-
--- Resize and reposition the XCS window
-tell application "System Events"
-	tell application process "xTool Creative Space"
-		set frontmost to true
-		delay 0.5
-		set position of front window to {posX, posY}
-		set size of front window to {targetWidth, targetHeight}
-	end tell
-end tell
-`;
-
-  return getPromiseRunScript(scriptContent);
-
-}
-
-
-function runAppleScriptForName(fileName, name, isFirstPrinting) {
-  const scriptContent = `
--- Set the paths
-set templatePath to "/Users/mcbookpro13/Desktop/coke/F1_XTool_Backend/output/template.xcs"
-set pngPath to "Users/mcbookpro13/Desktop/coke/F1_XTool_Backend/output/${name}.svg"
-
--- Step 3: Import the PNG using Cmd+Shift+I and typing the file path
-tell application "System Events"
-	tell application process "xTool Creative Space"
-		-- Press Command + N (New)
-		-- keystroke "n" using {command down}
-		-- delay 3
-
-    -- Simulate mouse click at 'Center' of original Image
-    do shell script "cliclick c:730,571"
-    delay 0.5
-
-
-    -- Simulate Del keyboard
-    tell application "System Events"
-      key code 51
-        delay 0.5
-    end tell
-
-		-- Press Command + I (Import)
-		keystroke "i" using {command down}
-		delay 2
-
-		-- Type the full path of the PNG
-		keystroke "/"
-        delay 0.5
-
-        --delay
-        keystroke pngPath
-        delay 1
-
-        -- Press Return to confirm the path
-		keystroke return
-        delay 1
-
-        -- Press Return to confirm the import
-		keystroke return
-        delay 1.5
-
-	end tell
-end tell
-
--- Simulate mouse click at 'Engrave' button
-do shell script "cliclick c:1439,386"
-delay 0.5
-
--- Simulate mouse click at 'Unknown Material' button
--- do shell script "cliclick c:1475,139"
--- delay 0.5
-
--- Simulate mouse click at 'Select Material' button
--- do shell script "cliclick c:718,506"
--- delay 0.5
-
--- Simulate mouse click at 'Save' button
--- do shell script "cliclick c:1097,753"
--- delay 0.5
-
--- Simulate mouse click at 'Laser Type' button
-do shell script "cliclick c:1521,575"
-delay 0.5
-
--- Simulate mouse click at 'IR' button
-do shell script "cliclick c:1410,631"
-delay 0.5
-
--- Simulate mouse click at 'Speed' button
-do shell script "cliclick c:1521,673"
-delay 0.5
-
--- Simulate type '1000' for Speed
-tell application "System Events"
-	keystroke "1000"
-  delay 0.5
-end tell
-
--- Simulate mouse click at 'LinesPerCM' button
-do shell script "cliclick c:1521,749"
-delay 0.5
-
--- Simulate mouse click at '220' button
-do shell script "cliclick c:1424,596"
-delay 0.5
-
--- Simulate mouse click at 'Height' button
-do shell script "cliclick c:398,223"
-delay 0.5
-
--- Simulate type '15' for Height
-tell application "System Events"
-	keystroke "15"
-    delay 0.5
-
-    -- Press Return to confirm the input
-    keystroke return
-    delay 0.5
-end tell
-
--- Simulate mouse click at 'X' button
-do shell script "cliclick c:245,188"
-delay 0.5
-
--- Simulate type '35' for Height
-tell application "System Events"
-	keystroke "${name.length > 4 ? 35 - (name.length - 4) * 7 : 35}"
-    delay 0.5
-
-    -- Press Return to confirm the input
-    keystroke return
-    delay 0.5
-end tell
-
--- Simulate mouse click at 'Y' button
-do shell script "cliclick c:396,195"
-delay 0.5
-
--- Simulate type '50' for Height
-tell application "System Events"
-	keystroke "50"
-    delay 0.5
-
-    -- Press Return to confirm the input
-    keystroke return
-    delay 0.5
-end tell
-
--- Simulate mouse click at 'Frame' button
-do shell script "cliclick c:1424,900"
-delay 1
-
--- Simulate mouse click at 'Process' button
-do shell script "cliclick c:1454,946"
-delay 2
-
--- Simulate mouse click at 'Start' button
-do shell script "cliclick c:1520,143"
-delay 1
-`;
-
-  return getPromiseRunScript(scriptContent);
-}
-
-function getPromiseRunScript(scriptContent) {
+/**
+ * Shared: write & run a PowerShell script, then clean up.
+ */
+function getPromiseRunPSScript(scriptContent) {
   return new Promise((resolve, reject) => {
+    const outputDir = path.join(process.cwd(), 'output');
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-	  const outputDir = path.join(process.cwd(), 'output'); // or /tmp
-	  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+    const tempFilePath = path.join(outputDir, `temp_${Date.now()}.ps1`);
 
-    const tempFilePath = path.join(outputDir, `temp_${Date.now()}.scpt`);
-
-    // Step 1: Write the script to a temp file
     fs.writeFile(tempFilePath, scriptContent, (err) => {
       if (err) return reject(err);
 
-      // Step 2: Execute the AppleScript
-      exec(`osascript "${tempFilePath}"`, (error, stdout, stderr) => {
-        // Step 3: Delete the temp file
+      const cmd = `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${tempFilePath}"`;
+      exec(cmd, { windowsHide: true }, (error, stdout, stderr) => {
         fs.unlink(tempFilePath, () => {
-          if (error) return reject(stderr || error.message);
+          if (error) return reject(stderr || error?.message);
           resolve(stdout);
         });
       });
@@ -220,4 +26,222 @@ function getPromiseRunScript(scriptContent) {
   });
 }
 
-module.exports = { runAppleScriptForName, runAppleScriptForPreAction, runAppleScriptForClosePrinting };
+/**
+ * Helper: PowerShell prelude (WinAPI + helpers).
+ * - ClickAt x,y
+ * - TypeText text
+ * - Hotkey sequences (SendKeys)
+ * - Activate/Move/Resize window for "xTool Creative Space"
+ */
+function psPrelude() {
+  return `
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# WinAPI helpers
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win {
+  [DllImport("user32.dll")] public static extern bool SetCursorPos(int X, int Y);
+  [DllImport("user32.dll")] public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, UIntPtr dwExtraInfo);
+  public const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+  public const int MOUSEEVENTF_LEFTUP   = 0x0004;
+
+  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+  [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+}
+"@
+
+function Click-At([int]$x, [int]$y) {
+  [Win]::SetCursorPos($x, $y) | Out-Null
+  Start-Sleep -Milliseconds 50
+  [Win]::mouse_event([Win]::MOUSEEVENTF_LEFTDOWN, 0, 0, 0, [UIntPtr]::Zero)
+  Start-Sleep -Milliseconds 50
+  [Win]::mouse_event([Win]::MOUSEEVENTF_LEFTUP, 0, 0, 0, [UIntPtr]::Zero)
+}
+
+function Type-Text([string]$txt) {
+  [System.Windows.Forms.SendKeys]::SendWait($txt)
+}
+
+function Press-Enter() { [System.Windows.Forms.SendKeys]::SendWait("~") }
+function Press-Del()   { [System.Windows.Forms.SendKeys]::SendWait("{DEL}") }
+
+function Focus-XCS {
+  $proc = Get-Process | Where-Object {
+    $_.MainWindowHandle -ne 0 -and ($_.ProcessName -like "*xTool*" -or $_.ProcessName -like "*Creative*" -or $_.MainWindowTitle -like "*xTool Creative Space*")
+  } | Select-Object -First 1
+
+  if ($null -eq $proc) { return $false }
+  [Win]::SetForegroundWindow($proc.MainWindowHandle) | Out-Null
+  return $proc.MainWindowHandle
+}
+
+function MoveResize-Window([IntPtr]$hWnd, [int]$x, [int]$y, [int]$w, [int]$h) {
+  [Win]::MoveWindow($hWnd, $x, $y, $w, $h, $true) | Out-Null
+}
+`;
+}
+
+/**
+ * Windows equivalent of: runAppleScriptForClosePrinting
+ * Click at (3000,300), wait 1s.
+ */
+function runWindowsScriptForClosePrinting() {
+  const scriptContent = `
+${psPrelude()}
+
+Click-At -x 3000 -y 300
+Start-Sleep -Seconds 1
+`;
+  return getPromiseRunPSScript(scriptContent);
+}
+
+/**
+ * Windows equivalent of: runAppleScriptForPreAction
+ * Center and resize xTool Creative Space to 1440x900.
+ */
+function runWindowsScriptForPreAction() {
+  const targetWidth = 1440;
+  const targetHeight = 900;
+
+  const scriptContent = `
+${psPrelude()}
+
+# Screen bounds
+$screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$screenWidth  = $screen.Width
+$screenHeight = $screen.Height
+
+$posX = [int](($screenWidth  - ${targetWidth}) / 2)
+$posY = [int](($screenHeight - ${targetHeight}) / 2)
+
+$hWnd = Focus-XCS
+if ($hWnd -ne $false) {
+  Start-Sleep -Milliseconds 500
+  MoveResize-Window -hWnd $hWnd -x $posX -y $posY -w ${targetWidth} -h ${targetHeight}
+}
+`;
+  return getPromiseRunPSScript(scriptContent);
+}
+
+/**
+ * Windows equivalent of: runAppleScriptForName(fileName, name, isFirstPrinting)
+ * Mirrors your clicks, deletes, imports, parameter typing, etc.
+ *
+ * Adjust paths and coordinates as needed.
+ */
+function runWindowsScriptForName(fileName, name, isFirstPrinting) {
+  // Compute your dynamic value like in your macOS template:
+  const dynamicXSize = name.length > 4 ? 35 - (name.length - 4) * 7 : 35;
+
+  // Update these paths to your actual Windows location.
+  // Double backslashes are needed inside JS strings.
+  const templatePath = "C:\\template.xcs";
+  const svgPath = `C:\\${name}.svg`;
+
+  const scriptContent = `
+${psPrelude()}
+
+# Bring XCS to front
+$hWnd = Focus-XCS
+Start-Sleep -Milliseconds 500
+
+# (Optional) New file shortcut if needed:
+# [System.Windows.Forms.SendKeys]::SendWait("^n")
+# Start-Sleep -Seconds 3
+
+# Click "Center" of original image (adjust coords as needed)
+Click-At -x 730 -y 571
+Start-Sleep -Milliseconds 500
+
+# Delete selection
+Press-Del
+Start-Sleep -Milliseconds 500
+
+# Import dialog (Ctrl+I on Windows typically)
+[System.Windows.Forms.SendKeys]::SendWait("^i")
+Start-Sleep -Seconds 2
+
+# Type the full path to the SVG and press Enter twice (dialog then confirm)
+Type-Text "${svgPath.replace(/\\/g, "\\\\")}"
+Start-Sleep -Seconds 1
+Press-Enter
+Start-Sleep -Seconds 1
+Press-Enter
+Start-Sleep -Milliseconds 1500
+
+# "Engrave" button
+Click-At -x 1439 -y 386
+Start-Sleep -Milliseconds 500
+
+# Laser Type button
+Click-At -x 1521 -y 575
+Start-Sleep -Milliseconds 500
+
+# IR button
+Click-At -x 1410 -y 631
+Start-Sleep -Milliseconds 500
+
+# Speed field
+Click-At -x 1521 -y 673
+Start-Sleep -Milliseconds 300
+Type-Text "1000"
+Start-Sleep -Milliseconds 500
+
+# LinesPerCM button
+Click-At -x 1521 -y 749
+Start-Sleep -Milliseconds 500
+
+# "220" (adjust if this is a dropdown item position)
+Click-At -x 1424 -y 596
+Start-Sleep -Milliseconds 500
+
+# Height field (X)
+Click-At -x 398 -y 223
+Start-Sleep -Milliseconds 300
+Type-Text "15"
+Start-Sleep -Milliseconds 500
+Press-Enter
+Start-Sleep -Milliseconds 500
+
+# Close small dialog (X at top-left of panel)
+Click-At -x 245 -y 188
+Start-Sleep -Milliseconds 500
+
+# Dynamic X size (based on name length)
+Type-Text "${dynamicXSize}"
+Start-Sleep -Milliseconds 500
+Press-Enter
+Start-Sleep -Milliseconds 500
+
+# Y field
+Click-At -x 396 -y 195
+Start-Sleep -Milliseconds 300
+Type-Text "50"
+Start-Sleep -Milliseconds 500
+Press-Enter
+Start-Sleep -Milliseconds 500
+
+# Frame button
+Click-At -x 1424 -y 900
+Start-Sleep -Seconds 1
+
+# Process button
+Click-At -x 1454 -y 946
+Start-Sleep -Seconds 2
+
+# Start button
+Click-At -x 1520 -y 143
+Start-Sleep -Seconds 1
+`;
+
+  return getPromiseRunPSScript(scriptContent);
+}
+
+module.exports = {
+  runWindowsScriptForName,
+  runWindowsScriptForPreAction: runWindowsScriptForPreAction,
+  runWindowsScriptForClosePrinting: runWindowsScriptForClosePrinting
+};
