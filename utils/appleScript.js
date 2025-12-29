@@ -166,7 +166,7 @@ Start-Sleep -Milliseconds 500
 Start-Sleep -Seconds 2
 
 # Type the full path to the SVG and press Enter twice (dialog then confirm)
-Type-Text "${svgPath.replace(/\\/g, "\\\\")}"
+Type-Text "${svgPath}"
 Start-Sleep -Seconds 1
 Press-Enter
 Start-Sleep -Seconds 1
