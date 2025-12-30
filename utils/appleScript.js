@@ -186,6 +186,10 @@ Start-Sleep -Milliseconds 1000
 Click-At -x 1456 -y 524
 Start-Sleep -Milliseconds 500
 
+# Power button
+Click-At -x 1505 -y 516
+Start-Sleep -Milliseconds 500
+
 # Speed field
 Click-At -x 1638 -y 567
 Start-Sleep -Milliseconds 300
@@ -237,7 +241,7 @@ Click-At -x 1552 -y 958
 Start-Sleep -Seconds 2
 
 # Start button
-Click-At -x 1520 -y 143
+Click-At -x 1558 -y 964
 Start-Sleep -Seconds 1
 `;
 
