@@ -168,11 +168,11 @@ Start-Sleep -Seconds 3
 # Type the full path to the SVG and press Enter twice (dialog then confirm)
 Type-Text "${svgPath}"
 Click-At -x 1040 -y 588
-Start-Sleep -Milliseconds 1500
+Start-Sleep -Milliseconds 3000
 
 # Click Scale Fit button
 Click-At -x 1200 -y 595
-Start-Sleep -Milliseconds 500
+Start-Sleep -Milliseconds 2000
 
 # "Engrave" button
 Click-At -x 1439 -y 386
