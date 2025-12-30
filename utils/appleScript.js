@@ -183,7 +183,7 @@ Click-At -x 609 -y 688
 Start-Sleep -Milliseconds 500
 
 # Apply Material button
-Click-At -x 1001 -y 510
+Click-At -x 1427 -y 457
 Start-Sleep -Milliseconds 500
 
 # "Engrave" button
