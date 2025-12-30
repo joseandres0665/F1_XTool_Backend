@@ -173,6 +173,10 @@ Start-Sleep -Seconds 1
 Press-Enter
 Start-Sleep -Milliseconds 1500
 
+# Click Scale Fit button
+Click-At -x 1200 -y 595
+Start-Sleep -Milliseconds 500
+
 # "Engrave" button
 Click-At -x 1439 -y 386
 Start-Sleep -Milliseconds 500

@@ -71,12 +71,12 @@ function isNameBanned(name) {
     
     // Extract banned names (skip header row)
     const bannedNames = data.slice(1)
-      .map(row => {
-        // Get first column value (name)
-        const nameValue = row[0] ? String(row[0]).trim() : '';
-        return nameValue.normalize('NFC');
-      })
-      .filter(nameValue => nameValue.length > 0);
+    .map(row => {
+      // Get first column value (name)
+      const nameValue = row[0] ? String(row[0]).trim() : '';
+      return nameValue.normalize('NFC');
+    })
+    .filter(nameValue => nameValue.length > 0);
     
     return checkNameAgainstList(name, bannedNames);
   } catch (error) {
@@ -94,6 +94,8 @@ function checkNameAgainstList(name, bannedNames) {
   // Check exact match (case-insensitive only for Latin characters)
   // For Arabic, we do exact match after normalization
   const isLatin = /^[a-zA-Z0-9\s]+$/.test(name);
+  console.log(normalizedName);
+  console.log(bannedNames);
   if (isLatin) {
     return bannedNames.some(banned => banned.toLowerCase() === normalizedName.toLowerCase());
   } else {
