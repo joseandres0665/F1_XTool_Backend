@@ -175,33 +175,33 @@ Click-At -x 1200 -y 595
 Start-Sleep -Milliseconds 2000
 
 # "Engrave" button
-Click-At -x 1439 -y 386
+Click-At -x 1596 -y 347
 Start-Sleep -Milliseconds 500
 
 # Laser Type button
-Click-At -x 1521 -y 575
-Start-Sleep -Milliseconds 500
+Click-At -x 1608 -y 470
+Start-Sleep -Milliseconds 1000
 
 # IR button
-Click-At -x 1410 -y 631
+Click-At -x 1456 -y 524
 Start-Sleep -Milliseconds 500
 
 # Speed field
-Click-At -x 1521 -y 673
+Click-At -x 1638 -y 567
 Start-Sleep -Milliseconds 300
 Type-Text "1000"
 Start-Sleep -Milliseconds 500
 
 # LinesPerCM button
-Click-At -x 1521 -y 749
-Start-Sleep -Milliseconds 500
+#Click-At -x 1521 -y 749
+#Start-Sleep -Milliseconds 500
 
 # "220" (adjust if this is a dropdown item position)
-Click-At -x 1424 -y 596
-Start-Sleep -Milliseconds 500
+#Click-At -x 1424 -y 596
+#Start-Sleep -Milliseconds 500
 
 # Height field (X)
-Click-At -x 398 -y 223
+Click-At -x 670 -y 230
 Start-Sleep -Milliseconds 300
 Type-Text "15"
 Start-Sleep -Milliseconds 500
@@ -209,17 +209,19 @@ Press-Enter
 Start-Sleep -Milliseconds 500
 
 # Close small dialog (X at top-left of panel)
-Click-At -x 245 -y 188
+Click-At -x 515 -y 372
+
 Start-Sleep -Milliseconds 500
 
 # Dynamic X size (based on name length)
 Type-Text "${dynamicXSize}"
+
 Start-Sleep -Milliseconds 500
 Press-Enter
 Start-Sleep -Milliseconds 500
 
 # Y field
-Click-At -x 396 -y 195
+Click-At -x 677 -y 204
 Start-Sleep -Milliseconds 300
 Type-Text "50"
 Start-Sleep -Milliseconds 500
@@ -227,11 +229,11 @@ Press-Enter
 Start-Sleep -Milliseconds 500
 
 # Frame button
-Click-At -x 1424 -y 900
+Click-At -x 1432 -y 963
 Start-Sleep -Seconds 1
 
 # Process button
-Click-At -x 1454 -y 946
+Click-At -x 1552 -y 958
 Start-Sleep -Seconds 2
 
 # Start button
