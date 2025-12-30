@@ -163,7 +163,7 @@ Start-Sleep -Milliseconds 500
 
 # Import dialog (Ctrl+I on Windows typically)
 [System.Windows.Forms.SendKeys]::SendWait("^i")
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 3
 
 # Type the full path to the SVG and press Enter twice (dialog then confirm)
 Type-Text "${svgPath}"

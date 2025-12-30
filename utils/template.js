@@ -131,7 +131,7 @@ async function generateTemplatePNG(name, isFirstPrinting) {
       }
       console.log('runWindowsScriptForName');
       
-      runWindowsScriptForName(`${name}.svg`, name, isFirstPrinting)
+      runWindowsScriptForName(OUTPUT, name, isFirstPrinting)
         .then(output => console.log("Success:", output))
         .catch(err => console.error("Error:", err));
     });
