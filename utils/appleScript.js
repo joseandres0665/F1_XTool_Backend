@@ -174,6 +174,18 @@ Start-Sleep -Milliseconds 3000
 Click-At -x 1200 -y 595
 Start-Sleep -Milliseconds 2000
 
+# Open Material Dialog
+Click-At -x 1656 -y 247
+Start-Sleep -Milliseconds 1000
+
+# Select Material button
+Click-At -x 609 -y 688
+Start-Sleep -Milliseconds 500
+
+# Apply Material button
+Click-At -x 1001 -y 510
+Start-Sleep -Milliseconds 500
+
 # "Engrave" button
 Click-At -x 1596 -y 347
 Start-Sleep -Milliseconds 500
@@ -209,16 +221,15 @@ Click-At -x 670 -y 230
 Start-Sleep -Milliseconds 300
 Type-Text "15"
 Start-Sleep -Milliseconds 500
-Press-Enter
-Start-Sleep -Milliseconds 500
 
 # Close small dialog (X at top-left of panel)
-Click-At -x 515 -y 372
+Click-At -x 585 -y 207
 
 Start-Sleep -Milliseconds 500
 
 # Dynamic X size (based on name length)
 Type-Text "${dynamicXSize}"
+
 
 Start-Sleep -Milliseconds 500
 Press-Enter
@@ -228,8 +239,6 @@ Start-Sleep -Milliseconds 500
 Click-At -x 677 -y 204
 Start-Sleep -Milliseconds 300
 Type-Text "50"
-Start-Sleep -Milliseconds 500
-Press-Enter
 Start-Sleep -Milliseconds 500
 
 # Frame button
